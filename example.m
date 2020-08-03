@@ -1,16 +1,16 @@
 clear; clc; close all;
 %% Setup Everything
-
+ 
 % Add the submodules to path
 addpath(genpath('OFDM-Matlab'))
 addpath(genpath('WARPLab-Matlab-Wrapper'))
 addpath(genpath('Power-Amplifier-Model'))
-
+ 
 rms_input = 0.50;
-
+ 
 % Setup the PA simulator or TX board
 PA_board = 'webRF'; % either 'WARP', 'webRF', or 'none'
-
+ 
 switch PA_board
     case 'WARP'
         warp_params.nBoards = 1;         % Number of boards
@@ -24,7 +24,7 @@ switch PA_board
         dbm_power = -24; % Originally -22
         board = webRF(dbm_power);
 end
-
+ 
 % Setup OFDM
 ofdm_params.nSubcarriers = 1200;
 ofdm_params.subcarrier_spacing = 15e3; % 15kHz subcarrier spacing
@@ -32,12 +32,12 @@ ofdm_params.constellation = 'QPSK';
 ofdm_params.cp_length = 144; % Number of samples in cyclic prefix.
 ofdm_params.nSymbols = 14;
 modulator = OFDM(ofdm_params);
-
+ 
 % Create TX Data
 [tx_data, ~] = modulator.use;
 tx_data = Signal(tx_data, modulator.sampling_rate, rms_input);
 tx_data.upsample(board.sample_rate)
-
+ 
 % Setup DPD
 dpd_params.order = 3;
 dpd_params.memory_depth = 1;
@@ -49,20 +49,20 @@ dpd_params.use_even = false;
 dpd_params.use_conj = 0;    % Conjugate branch. Currently only set up for MP (lag = 0)
 dpd_params.use_dc_term = 0; % Adds an additional term for DC
 dpd = ILA_DPD(dpd_params);
-
+ 
 %% Run Experiment
 [~, w_out_dpd] = board.transmit(tx_data.data);
 dpd.perform_learning(tx_data.data, board);
-
+ 
 [~, w_dpd] = board.transmit(dpd.predistort(tx_data.data));
 after = w_dpd.measure_all_powers;
-
+ 
 after_values = [after(1,1)];
 total_gradient = inf;
-
-while total_gradient > 0.5 % Iterates until the sum of the gradient vector is less than 0.5
+ 
+while total_gradient > 0.05 + 0.05i % Iterates until the sum of the gradient vector is less than 0.05 + 0.05i
     % Shift in R^2 space
-    del = 0.05 + 0.05i; 
+    del = 0.005 + 0.005; 
     coeff_length = length(dpd.coeffs);
     
     % Initialize an empty gradient_vector
@@ -94,7 +94,7 @@ while total_gradient > 0.5 % Iterates until the sum of the gradient vector is le
         minus_delta = after(1,1);
         
         dpd.coeffs = original_coeffs;
-        gradient_vector(i, 1) = (plus_delta - minus_delta)/sqrt(.02);
+        gradient_vector(i, 1) = (plus_delta - minus_delta) / (2 * del);
     end
     
     % This creates the Hessian Matrix
@@ -181,7 +181,7 @@ while total_gradient > 0.5 % Iterates until the sum of the gradient vector is le
                 % Reset dpd.coeffs back to the original coeffs
                 dpd.coeffs = original_coeffs;
                 % Set the value in the Hessian Matrix
-                hessian_grid(i, j) = (copy1_out - copy2_out - copy3_out - copy4_out) / (4 * (del ^ 2));
+                hessian_grid(i, j) = (copy1_out - copy2_out - copy3_out + copy4_out) / (4 * (del ^ 2));
             end
         end
     end
@@ -195,20 +195,23 @@ while total_gradient > 0.5 % Iterates until the sum of the gradient vector is le
     dpd.coeffs = dpd.coeffs - (inv_hess * gradient_vector);
     
     total_gradient = sum(gradient_vector);
-    disp(total_gradient)
+    g=sprintf('%d ', total_gradient);
+    fprintf('Total Gradient: %s\n', g)
     
     % Add to the after_values vector to tell whether model is actually
     % optimizing
     [~, w_dpd] = board.transmit(dpd.predistort(tx_data.data));
     after_lvalue = w_dpd.measure_all_powers;
-    after_values = [after_values, after_lvalue(1,1)]; 
-
+    after_values = [after_values, after_lvalue(1,1)];
+    
+    h=sprintf('%d ', after_values);
+    fprintf('After Values: %s\n', h)
+ 
 end
-
-disp(after_values);
-
+ 
+% disp(after_values);
+ 
 %% Plot
         w_out_dpd.plot_psd;
         w_dpd.plot_psd;
         dpd.plot_history;
-
