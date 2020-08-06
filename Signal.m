@@ -139,6 +139,7 @@ classdef Signal < handle
         end
         
         function powbp = measure_power(obj, type)
+            %Only use 20 MHz Case
             if (obj.obw >= 15e6) && (obj.obw <= 20e6) % 20 MHz Signal
                 ibw = 18e6;
                 offset = 20e6;
@@ -150,6 +151,9 @@ classdef Signal < handle
                 offset = 5e6;
             else
                 warning('Unknown original fs in Signal.m measure_power method')
+                %disp(obj.obw)
+                %disp(obj.data)
+                %disp(obj.current_fs)
                 powbp = -99;
                 return;
             end

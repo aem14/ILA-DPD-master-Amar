@@ -62,7 +62,7 @@ total_gradient = inf;
  
 while total_gradient > 0.05 + 0.05i % Iterates until the sum of the gradient vector is less than 0.05 + 0.05i
     % Shift in R^2 space
-    del = 0.005 + 0.005; 
+    del = 0.005 + 0.005i; 
     coeff_length = length(dpd.coeffs);
     
     % Initialize an empty gradient_vector
@@ -159,7 +159,10 @@ while total_gradient > 0.05 + 0.05i % Iterates until the sum of the gradient vec
                 
                 % Transmitting the four different vectors
                 dpd.coeffs = copy1;
-                [~, w_dpd] = board.transmit(dpd.predistort(tx_data.data));
+                dpd_out = dpd.predistort(tx_data.data);
+                [~, w_dpd] = board.transmit(dpd_out);
+                %w_dpd.current_fs = 200e6
+                %dbm = real value
                 after = w_dpd.measure_all_powers;
                 copy1_out = after(1,1);
                 
