@@ -58,9 +58,11 @@ dpd.perform_learning(tx_data.data, board);
 after = w_dpd.measure_all_powers;
  
 after_values = [after(1,1)];
+gradient_values = [];
+hess_values = [];
 total_gradient = inf;
  
-while total_gradient > 0.05 + 0.05i % Iterates until the sum of the gradient vector is less than 0.05 + 0.05i
+while abs(total_gradient) > 0.05 + 0.05i % Iterates until the sum of the gradient vector is less than 0.05 + 0.05i
     % Shift in R^2 space
     del = 0.005 + 0.005i; 
     coeff_length = length(dpd.coeffs);
@@ -198,8 +200,14 @@ while total_gradient > 0.05 + 0.05i % Iterates until the sum of the gradient vec
     dpd.coeffs = dpd.coeffs - (inv_hess * gradient_vector);
     
     total_gradient = sum(gradient_vector);
-    g=sprintf('%d ', total_gradient);
-    fprintf('Total Gradient: %s\n', g)
+    gradient_values = [gradient_values, total_gradient];
+    g=sprintf('%d ', gradient_values);
+    fprintf('Gradient Sum: %s\n', g)
+    
+    total_hess = sum(hessian_grid, 'all');
+    hess_values = [hess_values, total_hess];
+    f=sprintf('%f + %fi\n', hess_values, hess_values/1i);
+    fprintf('Hessian Sum: %s\n', f)
     
     % Add to the after_values vector to tell whether model is actually
     % optimizing
@@ -208,7 +216,7 @@ while total_gradient > 0.05 + 0.05i % Iterates until the sum of the gradient vec
     after_values = [after_values, after_lvalue(1,1)];
     
     h=sprintf('%d ', after_values);
-    fprintf('After Values: %s\n', h)
+    fprintf('Power Leakage: %s\n', h)
  
 end
  
