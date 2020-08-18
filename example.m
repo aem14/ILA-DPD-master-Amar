@@ -53,7 +53,8 @@ dpd = ILA_DPD(dpd_params);
 %% Run Experiment
 [~, w_out_dpd] = board.transmit(tx_data.data);
 dpd.perform_learning(tx_data.data, board);
- 
+original_dpd_coeffs = dpd.coeffs;
+
 [~, w_dpd] = board.transmit(dpd.predistort(tx_data.data));
 after = w_dpd.measure_all_powers;
 
