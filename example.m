@@ -77,7 +77,7 @@ while abs(total_gradient) > 0.05 + 0.05i % Iterates until the sum of the gradien
     % Initialize an empty gradient_vector
     gradient_vector = zeros(coeff_length,1);
     
-    for i = 1:coeff_length % Fills in each value in the gradient vector
+    for i = 2:coeff_length % Fills in each value in the gradient vector
         original_coeffs = dpd.coeffs;
         plus_delta = dpd.coeffs;
         minus_delta = dpd.coeffs;
