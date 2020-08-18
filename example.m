@@ -63,7 +63,8 @@ w_out_dpd.plot_psd;
 
 w_dpd.name = 'LS Solution DPD after RFWebLab';
 w_dpd.plot_psd;
- 
+
+% Record the L1 power
 after_values = [after(1,1)];
 gradient_values = [];
 hess_values = [];
