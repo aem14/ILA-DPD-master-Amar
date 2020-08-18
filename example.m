@@ -21,7 +21,7 @@ switch PA_board
         board = PowerAmplifier(7, 4);
         Fs = 40e6;    % WARP board sampling rate.
     case 'webRF'
-        dbm_power = -24; % Originally -22
+        dbm_power = -25; % Originally -22
         board = webRF(dbm_power);
 end
  
@@ -43,7 +43,7 @@ dpd_params.order = 3;
 dpd_params.memory_depth = 1;
 dpd_params.lag_depth = 0;  % 0 is a standard MP. >0 is GMP.
 dpd_params.nIterations = 1;
-dpd_params.learning_rate = 0.75;
+dpd_params.learning_rate = 1;
 dpd_params.learning_method = 'newton'; % Or 'ema' for exponential moving average.
 dpd_params.use_even = false; 
 dpd_params.use_conj = 0;    % Conjugate branch. Currently only set up for MP (lag = 0)
