@@ -106,3 +106,12 @@ end
 
 %% Plot the results
 % TODO.
+steps_in_each_direction = sqrt(length(results_array));
+results_array_square = reshape(results_array, steps_in_each_direction, steps_in_each_direction);
+
+
+X = reshape(real(coeff_array), steps_in_each_direction,steps_in_each_direction);
+Y = reshape(imag(coeff_array), steps_in_each_direction,steps_in_each_direction);
+
+surf(X, Y, results_array_square)
+
