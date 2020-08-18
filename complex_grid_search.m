@@ -94,11 +94,12 @@ for real_diff = -2*step_size:step_size:2*step_size
         if (this_power_results(1) < best_result)
             best_result = this_power_results(1);
             best_index = test_index;
+            best_signal = Signal(test_dpd.data, test_dpd.current_fs); 
         end
         
         % Save all the results
         results_array = [results_array this_power_results(1)];
-        test_index = test_index + 1;
+        test_index = test_index + 1
         save('checkpoint.mat');
     end
 end
