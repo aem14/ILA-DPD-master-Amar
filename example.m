@@ -56,6 +56,13 @@ dpd.perform_learning(tx_data.data, board);
  
 [~, w_dpd] = board.transmit(dpd.predistort(tx_data.data));
 after = w_dpd.measure_all_powers;
+
+% Plot the before and after
+w_out_dpd.name = 'Without DPD after RFWebLab';
+w_out_dpd.plot_psd;
+
+w_dpd.name = 'LS Solution DPD after RFWebLab';
+w_dpd.plot_psd;
  
 after_values = [after(1,1)];
 gradient_values = [];
