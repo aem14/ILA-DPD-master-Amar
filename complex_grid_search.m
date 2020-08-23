@@ -81,11 +81,13 @@ best_result = inf;
 best_index = 0;
 coeff_array = [];
 results_array = [];
+diff_array = [];
 for real_diff = -2*step_size:step_size:2*step_size
     for imag_diff = -2*step_size:step_size:2*step_size
         this_complex_diff = real_diff + 1i * imag_diff;
         dpd.coeffs = original_dpd_coeffs;
         dpd.coeffs(2) = dpd.coeffs(2) + this_complex_diff;
+        diff_array = [diff_array this_complex_diff];
         coeff_array = [coeff_array dpd.coeffs(2)];  % Append this coeff to array
         [~, test_dpd] = board.transmit(dpd.predistort(tx_data.data));
         this_power_results = test_dpd.measure_all_powers;
@@ -103,6 +105,8 @@ for real_diff = -2*step_size:step_size:2*step_size
         save('checkpoint.mat');
     end
 end
+
+diff_array
 
 %% Plot the results
 % TODO.

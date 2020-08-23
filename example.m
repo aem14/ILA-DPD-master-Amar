@@ -97,15 +97,15 @@ while abs(total_gradient) > 0.05 + 0.05i % Iterates until the sum of the gradien
         dpd.coeffs = plus_delta;
         [~, w_dpd] = board.transmit(dpd.predistort(tx_data.data));
         after = w_dpd.measure_all_powers;
-        plus_delta = after(1,1);
+        plus_delta_out = after(1,1);
         
         dpd.coeffs = minus_delta;
         [~, w_dpd] = board.transmit(dpd.predistort(tx_data.data));
         after = w_dpd.measure_all_powers;
-        minus_delta = after(1,1);
+        minus_delta_out = after(1,1);
         
         dpd.coeffs = original_coeffs;
-        gradient_vector(i, 1) = (plus_delta - minus_delta) / (2 * del);
+        gradient_vector(i, 1) = (plus_delta_out - minus_delta_out) / (2 * del);
     end
     
     % This creates the Hessian Matrix
