@@ -9,6 +9,7 @@ classdef Signal < handle
     % Feb 7, 2020
     
     properties
+        name
         data
         current_fs
         original_fs
@@ -39,6 +40,7 @@ classdef Signal < handle
             end
             obj.calculate_current_papr();
             obj.compute_occupied_bandwidth();
+            obj.name = '';
         end
         
         function normalize_to_this_rms(obj, this_rms)
@@ -106,16 +108,17 @@ classdef Signal < handle
             Signal_PSD = 10*log10(fftshift(pwelch(obj.data, Window)));
             if nargin == 2
                 plot(figure_handle, (-1:2/Nfft:1-2/Nfft)*((obj.current_fs)/(2e6)), Signal_PSD, ...
-                    'LineWidth', 0.5);
+                    'LineWidth', 0.5, 'DisplayName', obj.name);
             else
                 figure(99);
                 grid on;
                 hold on;
                 title('PSD');
                 plot((-1:2/Nfft:1-2/Nfft)*((obj.current_fs)/(2e6)), Signal_PSD, ...
-                    'LineWidth', 0.5);
+                    'LineWidth', 0.5, 'DisplayName',obj.name);
                 xlabel('Frequency (MHz)');
                 ylabel('PSD (db/Hz)');
+                legend show;
             end
         end
         
@@ -139,6 +142,7 @@ classdef Signal < handle
         end
         
         function powbp = measure_power(obj, type)
+            %Only use 20 MHz Case
             if (obj.obw >= 15e6) && (obj.obw <= 20e6) % 20 MHz Signal
                 ibw = 18e6;
                 offset = 20e6;
@@ -150,6 +154,9 @@ classdef Signal < handle
                 offset = 5e6;
             else
                 warning('Unknown original fs in Signal.m measure_power method')
+                %disp(obj.obw)
+                %disp(obj.data)
+                %disp(obj.current_fs)
                 powbp = -99;
                 return;
             end
